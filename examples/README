@@ -1,0 +1,6 @@
+The example policy mls-tools-example added policy to the user_t domain. In 
+order for the examples to work the SELinux user user_u needs to be able to 
+run ranged SystemLow-SystemHigh. You can use semanage or the SELinux 
+Administration GUI to modify the SELinux user and the SELinux default login
+prior to using the mls-tools examples. Alternatively you could use a different
+SELinux user (staff_u) for testing purposes.
