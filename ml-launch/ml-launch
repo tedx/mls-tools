@@ -1,0 +1,3 @@
+#!/bin/sh
+/usr/bin/python2 /usr/share/mls-tools/ml_launch.py "$@"
+

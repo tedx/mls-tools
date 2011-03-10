@@ -1,0 +1,10 @@
+HOME_DIR/\.dbus\.inst/.+	<<none>>
+HOME_DIR/\.gconf\.inst	-d	gen_context(system_u:object_r:gconf_home_t,s0-s15:c0.c1023)
+HOME_DIR/\.gconf\.inst/.+	<<none>>
+HOME_DIR/\.gconfd\.inst	-d	gen_context(system_u:object_r:gconf_home_t,s0-s15:c0.c1023)
+HOME_DIR/\.gconfd\.inst/.+	<<none>>
+HOME_DIR/\.gnome2\.inst	-d	gen_context(system_u:object_r:gnome_home_t,s0-s15:c0.c1023)
+HOME_DIR/\.gnome2\.inst/.+	<<none>>
+HOME_DIR/\.openoffice\.org\.inst/.+	<<none>>
+HOME_DIR/\.mozilla\.inst	-d	gen_context(system_u:object_r:mozilla_home_t,s0-s15:c0.c1023)
+HOME_DIR/\.mozilla\.inst/.+	<<none>>

@@ -1,0 +1,4 @@
+/usr/bin/ml-launch	--	gen_context(system_u:object_r:bin_t,s0)
+/usr/share/mls-tools/label-dialog	--	gen_context(system_u:object_r:ml_launch_exec_t,s0)
+/usr/share/mls-tools/get-file-level	--	gen_context(system_u:object_r:ml_launch_exec_t,s0)
+/usr/share/mls-tools/check-dominance	--	gen_context(system_u:object_r:ml_launch_exec_t,s0)

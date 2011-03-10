@@ -1,0 +1,56 @@
+.TH "ml-launch" "1" "0.0.1" "Ted X Toth" "Application"
+.SH "NAME"
+.LP 
+ml\-launch \- newrole wrapper providing a multi\-level launch graphical interface
+.SH "SYNTAX"
+.LP 
+ml\-launch [\fIoptions\fP] <\fIcommand\fP> <\fIarguments\fP>
+.SH "DESCRIPTION"
+.LP 
+This program is a newrole wrapper providing a multi\-level launch graphical interface.
+.SH "OPTIONS"
+.LP 
+.TP 
+\fB[\-l |\-\-level=]\fR<\fIMLS range\fP>
+<\fIMLS range\fP> which command will run at.
+.TP 
+\fB[\-t |\-\-title=]\fR<\fIwindow title\fP>
+Title put on window.
+.TP 
+\fB[\-d|\-\-debug]\fR
+Output debug information to stdout.
+.TP 
+\fB[\-n|\-\-no\-environment]\fR
+Do not have newrole perserve the environment.
+.TP 
+\fB[\-u|\-\-use\-execv]\fR
+If a level is specified this option can be used to bypass the use of pexpect to run the command instead using execv for better performance.
+.TP 
+\fB[\-c|\-\-current\-level]\fR
+Run the command at the current processes level.
+.TP 
+\fB[\-h|\-\-clearance]\fR
+Run the command at the current processes clearance.
+.TP 
+\fB[\-s|\-\-selinux\-user\-range]\fR
+Run the command at the SELinux users range.
+.TP 
+\fB[\-b|\-\-dont\-background]\fR
+Default behavior is to run command in the background this option causes the command to run in the foreground allowing its parent to get its return code.
+.TP 
+\fB[\-f |\-\-file\-level=]\fR <\fIfile name\fP>
+Run the command at the level of the specified file.
+.TP 
+\fB[\-m |\-\-max\-level\-or\-clearance=]\fR <\fIlevel\fP>
+Run the command at the lower of the level specified or the users clearance.
+.SH "SEE ALSO"
+\fBnewrole\fR(1)
+.SH "EXAMPLES"
+.LP 
+To run this program the standard way type:
+.LP 
+/usr/bin/ml\-launch \-n "/usr/share/mls\-tools/gnome\-terminal\-disable\-factory >& /dev/null"
+
+.SH "AUTHORS"
+.LP 
+Ted X Toth <txtoth@gmail.com>

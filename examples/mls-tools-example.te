@@ -1,0 +1,48 @@
+module mls-tools-example 1.0;
+
+require {
+	type user_t;
+	all_kernel_class_perms
+	all_userspace_class_perms
+	type xserver_t;
+	type user_wm_t;
+	type security_t;
+	type xdm_t;
+	type newrole_t;
+	type gconf_home_t;
+	type gnome_home_t;
+	type mozilla_home_t;
+	type user_home_t;
+	type tmp_t;
+}
+
+mls_trusted_object(xserver_t)
+
+mls_xwin_write_all_levels(xserver_t)
+mls_socket_write_all_levels(xserver_t)
+mls_socket_read_all_levels(xserver_t)
+mls_sysvipc_write_all_levels(xserver_t)
+mls_sysvipc_read_all_levels(xserver_t)
+allow xserver_t security_t:security compute_member;
+
+mls_xwin_write_all_levels(user_t)
+mls_socket_write_to_clearance(user_t)
+
+mls_socket_write_all_levels(user_wm_t)
+mls_socket_read_all_levels(user_wm_t)
+
+ml_launch_template1(user, user_t, user_r)
+
+files_mounton_all_poly_members(xdm_t)
+files_mounton_all_poly_members(newrole_t)
+allow newrole_t gconf_home_t:dir read;
+allow newrole_t gnome_home_t:dir read;
+allow newrole_t mozilla_home_t:dir read;
+allow newrole_t user_home_t:dir read;
+allow newrole_t tmp_t:dir read;
+
+allow xdm_t gconf_home_t:dir read;
+allow xdm_t gnome_home_t:dir read;
+allow xdm_t mozilla_home_t:dir read;
+allow xdm_t user_home_t:dir read;
+allow xdm_t tmp_t:dir read;

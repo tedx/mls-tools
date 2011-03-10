@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=ML Terminal
+Name[ja]=ML Terminal
+Name[ko]=ML Terminal (ML 터미너)
+Comment=Multilevel Terminal
+Comment[ja]=Multilevel Terminal
+Comment[ko]=Multilevel Terminal (Multilevel 터미너)
+Exec=/usr/bin/ml-launch -n "/usr/bin/dbus-launch --exit-with-session /usr/share/mls-tools/examples/gnome-terminal/gnome-terminal-disable-factory >& /dev/null"
+Icon=gnome-terminal.png
+Type=Application
+Categories=Application
+StartupNotify=true

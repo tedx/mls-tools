@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Terminal=false
+Icon=openofficeorg-draw
+Type=Application
+InitialPreference=2
+Categories=Application;Office;X-Red-Hat-Base;X-SuSE-Core-Office;
+Exec=/usr/share/mls-tools/examples/oo/ml-oo-draw
+Name=OpenOffice.org Draw at level
+StartupNotify=true
+NoDisplay=true
+MimeType=application/vnd.oasis.opendocument.graphics;application/vnd.oasis.opendocument.graphics-template;application/vnd.sun.xml.draw;application/vnd.sun.xml.draw.template;application/vnd.stardivision.draw;

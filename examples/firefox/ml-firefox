@@ -1,0 +1,8 @@
+#!/bin/bash
+profile=`id -Z | cut -d : -f 4 | sed -e's/[^A-Za-z0-9]/./g'`
+env MOZ_NO_REMOTE=1 /usr/bin/firefox -CreateProfile "$profile"
+if [ $# -eq 0 ]; then
+    env MOZ_NO_REMOTE=1 /usr/bin/firefox -P "$profile" http://localhost
+else
+    env MOZ_NO_REMOTE=1 /usr/bin/firefox -P "$profile" $@
+fi

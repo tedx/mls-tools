@@ -1,0 +1,165 @@
+## <summary> ML Launch </summary>
+#
+
+########################################
+## <summary>
+##      Run ml-launch in user ml_launch domain.
+## </summary>
+## <desc>
+##      <p>
+##      Run ml-launch in ml_launch domain.
+##      </p>
+##      <p>
+##      This is a templated interface, and should only
+##      be called from a per-userdomain template.
+##      </p>
+## </desc>
+## <param name="userdomain_prefix">
+##      <summary>
+##      The prefix of the user domain (e.g., user
+##      is the prefix for user_t).
+##      </summary>
+## </param>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+
+interface(`ml_launch_run',`
+	gen_require(`
+		type ml_launch_exec_t,$1_ml_launch_t;
+	')
+
+	domtrans_pattern($2,ml_launch_exec_t,$1_ml_launch_t)
+')
+
+template(`ml_launch_template',`
+	gen_require(`
+		type ml_launch_exec_t;
+		type $2;
+		type $1_wm_t;
+		type $1_devpts_t;
+		type user_tmp_t;
+		type tmpfs_t;
+		type xdm_xserver_t;
+		type $1_xproperty_t;
+                type user_home_t;
+		type gconf_home_t;
+		class context contains;
+		attribute file_type;
+		type system_dbusd_var_lib_t;
+		type xserver_port_t;
+	')
+
+	type $1_ml_launch_t;
+	type $1_ml_launch_tmpfs_t;
+	type $1_ml_launch_xserver_tmpfs_t;
+
+	role $3 types $1_ml_launch_t;
+
+	application_domain($1_ml_launch_t,ml_launch_exec_t)
+	domain_interactive_fd($1_ml_launch_t)
+
+	xserver_user_x_domain_template($1_ml_launch, $1_ml_launch_t, $1_ml_launch_tmpfs_t)
+	xserver_create_xdm_tmp_sockets($1_ml_launch_t)
+	xserver_read_xdm_tmp_files($1_ml_launch_t)
+
+	userdom_manage_user_tmp_sockets($1_ml_launch_t)
+
+	optional_policy(`
+		dbus_system_bus_client($1_ml_launch_t)
+		dbus_connect_system_bus($1_ml_launch_t)
+	')
+
+	seutil_read_config($1_ml_launch_t)
+	seutil_read_default_contexts($1_ml_launch_t)
+	selinux_get_enforce_mode($1_ml_launch_t)
+
+	ml_launch_run($1,$2)
+
+	files_read_etc_files($1_ml_launch_t)
+	miscfiles_read_localization($1_ml_launch_t)
+
+	libs_use_ld_so($1_ml_launch_t)
+	libs_use_shared_libs($1_ml_launch_t)
+
+	nscd_dontaudit_search_pid($1_ml_launch_t)
+
+	dev_read_urand($1_ml_launch_t)
+
+	files_list_tmp($1_ml_launch_t)
+	files_read_usr_files($1_ml_launch_t)
+
+	corecmd_exec_bin($1_ml_launch_t)
+
+	kernel_read_system_state($1_ml_launch_t)
+	logging_send_audit_msgs($1_ml_launch_t)
+	logging_send_syslog_msg($1_ml_launch_t)
+
+	term_create_pty($1_ml_launch_t, $1_devpts_t)
+	allow $1_ml_launch_t $1_devpts_t:chr_file { read write ioctl getattr };
+
+	fs_rw_tmpfs_files($1_ml_launch_t)
+	files_manage_generic_tmp_dirs($1_ml_launch_t)
+	files_manage_generic_tmp_files($1_ml_launch_t)
+	files_rw_generic_tmp_sockets($1_ml_launch_t)
+	manage_files_pattern($1_ml_launch_t,user_tmp_t,user_tmp_t)
+	manage_dirs_pattern($1_ml_launch_t,user_tmp_t,user_tmp_t)
+
+	gnome_read_gconf_home_files($1_ml_launch_t)
+	write_files_pattern($1_ml_launch_t, gconf_home_t, gconf_home_t)
+	manage_dirs_pattern($1_ml_launch_t, gconf_home_t, gconf_home_t)
+
+	corenet_tcp_sendrecv_generic_if($1_ml_launch_t)
+	corenet_tcp_sendrecv_generic_node($1_ml_launch_t)
+	stream_connect_pattern($2,xdm_tmp_t,xdm_tmp_t,$1_ml_launch_t)
+	stream_connect_pattern($2,user_tmp_t,user_tmp_t,$1_ml_launch_t)
+ 
+	sysnet_dontaudit_read_config($1_ml_launch_t)
+
+	allow $1_ml_launch_t xserver_port_t:tcp_socket name_connect;
+	allow $1_ml_launch_t $2:unix_stream_socket connectto;
+
+        # gdm auth db (not pid)
+	files_search_pids($1_ml_launch_t)
+	read_files_pattern($1_ml_launch_t, xdm_var_run_t, xdm_var_run_t)
+
+	dontaudit $2 $1_ml_launch_t:process ptrace;
+	allow $1_ml_launch_t self:process { signal getsched setcap };
+	allow $1_ml_launch_t self:fifo_file rw_fifo_file_perms;
+
+	allow $1_ml_launch_t self:netlink_route_socket create_netlink_socket_perms;
+
+	allow $1_ml_launch_t $1_xproperty_t:x_property destroy;
+	allow $2 $1_ml_launch_xproperty_t:x_property destroy;
+	allow $1_ml_launch_t root_xdrawable_t:x_drawable all_x_drawable_perms;
+	allow $1_ml_launch_t root_xdrawable_t:x_colormap use;
+	allow $1_ml_launch_t xserver_t:x_resource { read write };
+
+# Allow write of history file
+        allow $1_ml_launch_t user_home_t:dir rw_dir_perms;
+        allow $1_ml_launch_t user_home_t:file manage_file_perms;
+        allow $1_ml_launch_t user_home_t:lnk_file manage_lnk_file_perms;
+
+	allow $1_ml_launch_t xserver_t:x_device { setfocus setattr };
+        allow $1_ml_launch_t tmp_t:file { create write read unlink };
+        ifdef(`enable_mls',`
+                mls_xwin_read_all_levels($1_ml_launch_t)
+                mls_xwin_write_all_levels($1_ml_launch_t)
+		mls_file_read_all_levels($1_ml_launch_t)
+		mls_file_write_within_range($1_ml_launch_t)
+
+	')
+
+	allow $1_ml_launch_t self:context contains;
+	selinux_compute_access_vector($1_ml_launch_t)
+	# for get_file_level
+	allow $1_ml_launch_t file_type:dir { search };
+	allow $1_ml_launch_t file_type:file { getattr };
+	# for check_dominanace
+	allow $1_ml_launch_t $1_t:unix_stream_socket { read write };
+	allow $2 $1_ml_launch_input_xevent_t:x_event receive;
+	allow $1_wm_t $1_ml_launch_input_xevent_t:x_event receive;
+ ')

@@ -1,0 +1,2 @@
+#!/bin/bash
+/usr/bin/ml-launch -n --use-execv --file-level="$1" openoffice.org -draw \"$1\"

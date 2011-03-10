@@ -1,0 +1,366 @@
+--- label_dialog.py	2011-01-27 13:00:55.431490980 -0600
++++ /usr/share/mls-tools/label_dialog.py	2011-01-27 15:48:32.957526125 -0600
+@@ -37,11 +37,11 @@
+ 
+ def getSensitivity(domain, context, debug=False):
+     if debug:
+-        print("getSensitivity: %s" % context)
++        logging.debug("getSensitivity: %s" % context)
+     range = context.split(":")[3]
+     clearance = range.split("-")[len(range.split("-"))-1]
+     if debug:
+-        print("getSensitivity: %s" % clearance)
++        logging.debug("getSensitivity: %s" % clearance)
+ 
+     # Put all of the levels in list and sort them by length
+     levels = copy.copy(domain.sensitivities.values())
+@@ -57,13 +57,12 @@
+             break
+     
+     if debug:
+-        print "getSensitivity: %s" % found_level
++        logging.debug("getSensitivity: %s" % found_level)
+ 
+     return found_level
+ 
+ (rc, context) = selinux.getcon()
+ if rc < 0:
+-#    print >>sys.stderr, "Error getting context"
+     error_dialog("Failed to get process context, exiting")
+     sys.exit(-1)
+ 
+@@ -171,7 +170,7 @@
+ 
+ def parse(domain, label, debug):
+     if debug:
+-        print "parse label %s" % label
++        logging.debug("parse label %s" % label)
+     context = "a:b:c:" + label
+     (rc, raw) = selinux_trans_to_raw_context(context)
+     if raw == context:
+@@ -182,7 +181,7 @@
+ 
+     label = context.lstrip("a:b:c:")
+     if debug:
+-        print "parse transformed label %s" % label
++        logging.debug("parse transformed label %s" % label)
+ 
+     # Put all of the levels in list and sort them by length
+     levels = copy.copy(domain.sensitivities.values())
+@@ -217,7 +216,7 @@
+                 for prefix in prefixes:
+                     if label.startswith(prefix + " "):
+                         if debug:
+-                            print "matched prefix %s" % prefix
++                            logging.debug("matched prefix %s" % prefix)
+                         label = label[len(prefix):]
+                         label = label.lstrip()
+                         matched_prefix = True
+@@ -232,7 +231,7 @@
+                 for codeword in codewords:
+                     if label.startswith(codeword.word):
+                         if debug:
+-                            print "matched word %s" % codeword.word
++                            logging.debug("matched word %s" % codeword.word)
+                         label = label[len(codeword.word):]
+                         label = label.lstrip()
+                         labelObj.addCodeWord(group, codeword.word)
+@@ -240,11 +239,11 @@
+                         # remove it
+                         if group.join != "":
+                             if debug:
+-                                print "group join character %s %s" % (group.join, label[0:1])
++                                logging.debug("group join character %s %s" % (group.join, label[0:1]))
+                             if label[0:1] == group.join:
+                                 label = label[1:]
+                         if debug:
+-                            print "next character %s" % (label[0:1])
++                            logging.debug("next character %s" % (label[0:1]))
+                         codeword_found = True
+ 
+             if len(group.suffixes) > 0:
+@@ -280,13 +279,13 @@
+     def __init__(self, gladeFile, label, debug):
+         self.debug = debug
+         if self.debug:
+-            print("WordDialog.__init__: %s" % gladeFile);
++            logging.debug("WordDialog.__init__: %s" % gladeFile);
+         if os.access (gladeFile, os.F_OK):
+             self.tree = gtk.glade.XML(gladeFile, domain="label-dialog")
+         else:
+             self.tree = gtk.glade.XML("/usr/share/ml-launch/" + gladeFile, domain="label-dialog")
+         if self.debug:
+-            print("WordDialog.__init__: ", self.tree);
++            logging.debug("WordDialog.__init__: " + self.tree);
+         closeButton = self.tree.get_widget('closeButton')
+         closeButton.connect('clicked', self.dialogClose)
+         self.dialogWindow = self.tree.get_widget('wordDialog')
+@@ -388,66 +387,7 @@
+         threading.Thread.__init__(self)
+         
+     def run ( self ):
+-        if self.label_dialog.title:
+-            if self.label_dialog.debug:
+-                logging.debug(_("title %s") % (self.label_dialog.title))
+-            self.label_dialog.dialogWindow.set_title(self.label_dialog.title)
+-
+-        closeButton = self.label_dialog.widgets['cancelButton']
+-        closeButton.connect('clicked', self.label_dialog.dialogClose)
+-        self.label_dialog.okButton = self.label_dialog.widgets['okButton']
+-        self.label_dialog.okButtonHandlerId = self.label_dialog.okButton.connect('clicked', self.label_dialog.Ok)
+-        self.label_dialog.dialogWindow.connect('close', self.label_dialog.close)
+-        self.label_dialog.dialogWindow.connect('delete_event', self.label_dialog.close)
+-        self.label_dialog.dialogWindow.set_position(gtk.WIN_POS_MOUSE)
+-
+-# Populate the levels combobox
+-        self.label_dialog.levels_combobox = self.label_dialog.widgets['levelComboBox']
+-        self.label_dialog.levels_combobox.set_tooltip_text("Select level for new label.")
+-        for key in self.label_dialog.domain.sensitivities.keys():
+-            if self.label_dialog.domain.sensitivities[key].find("-") == -1:
+-                if self.label_dialog.debug:
+-                    print("%s %s" % (self.label_dialog.sensitivity, self.label_dialog.domain.sensitivities[key]))
+-                if check_level_dominance2(self.label_dialog.sensitivity, self.label_dialog.domain.sensitivities[key]):
+-                    self.label_dialog.levels_combobox.append_text(self.label_dialog.domain.sensitivities[key])
+-        for key in self.label_dialog.domain.baseClassifications.keys():
+-            for sensitivity in self.label_dialog.domain.baseClassifications[key].sensitivities.keys():
+-                if check_level_dominance2(self.label_dialog.sensitivity, self.label_dialog.domain.baseClassifications[key].sensitivities[sensitivity]):
+-                    self.label_dialog.levels_combobox.append_text(self.label_dialog.domain.baseClassifications[key].sensitivities[sensitivity])
+-        self.label_dialog.levels_combobox.connect("changed", self.label_dialog.level_selection_changed )
+-
+-# Populate the group combobox
+-        self.label_dialog.groups_combobox = self.label_dialog.widgets['groupComboBox']
+-        self.label_dialog.groups_combobox.set_tooltip_text("Set words on new label.")    
+-        for key in self.label_dialog.domain.groups.keys():
+-            self.label_dialog.groups_combobox.append_text(key)
+-
+-        self.label_dialog.groups_combobox.connect("changed", self.label_dialog.group_selection_changed )
+-#        self.label_dialog.groups_combobox.connect("notify::popup-shown", self.label_dialog.group_popup )
+-        self.label_dialog.groups_combobox.connect('button-press-event', self.label_dialog.on_cb_clicked)
+-        self.label_dialog.groups_combobox.set_sensitive(False)
+-        self.label_dialog.groups_combobox.show()
+-
+-
+-# Load history
+-
+-        self.label_dialog.history = OrderedDict()
+-        self.label_dialog.load_history(True)
+-# Populate the 
+-        self.label_dialog.history_combobox = self.label_dialog.widgets['levelComboBoxEntry']
+-        self.label_dialog.history_combobox.set_tooltip_text("History list of previously used labels.")
+-        for label in self.label_dialog.history.keys():
+-            if check_level_dominance(label, False):
+-                self.label_dialog.history_combobox.append_text(label)
+-        self.label_dialog.history_combobox.connect("changed", self.label_dialog.history_selection_changed )
+-        self.label_dialog.entry = self.label_dialog.widgets['levelComboBoxEntry'].child
+-        self.label_dialog.entry.connect("delete-text", self.label_dialog.delete_text, self.label_dialog)
+-        self.label_dialog.entry.connect("insert-text", self.label_dialog.insert_text, self.label_dialog)
+-        self.label_dialog.history_combobox.show()
+-        self.label_dialog.label = Label(self.label_dialog.domain)
+-        self.label_dialog.wordDialog = None
+-        self.label_dialog.build_used_codeword_list()
+-
++        populate_label_dialog(self.label_dialog)
+ 
+ class LabelDialog(gobject.GObject):
+     __gsignals__ = {
+@@ -455,8 +395,6 @@
+         "selected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_STRING]),
+         }
+ 
+-    gladeFile = "ml-launch.glade"
+-
+     def dialogClose(self, dialog):
+         if self.debug:
+             logging.debug("dialogClose")
+@@ -473,7 +411,7 @@
+ 
+     def open(self):
+         if self.debug:
+-            print("open")
++            logging.debug("open")
+         self.show()
+         gtk.gdk.threads_init()
+         gtk.gdk.threads_enter()
+@@ -482,9 +420,10 @@
+ 
+     def init(self, foo):
+         if self.debug:
+-            print("init")
+-        thread = LabelDialogInitThread(self)
+-        thread.start()
++            logging.debug("init")
++        populate_label_dialog(self)
++#        thread = LabelDialogInitThread(self)
++#        thread.start()
+ 
+ 
+     def destroy(self):
+@@ -508,7 +447,7 @@
+             mcstrans.process_file("/etc/selinux/mls/setrans.conf", False)
+         except Exception, ex:
+             if debug:
+-                print traceback.format_exc()
++               logging.debug( traceback.format_exc())
+             error_dialog("Error read mcstrans configuration data.")
+             sys.exit(-1)
+ 
+@@ -518,11 +457,11 @@
+             self.domain = mcstrans.domains["Default"]
+ 
+         if debug:
+-            print "__init__ call getSensitvity"
++            logging.debug("__init__ call getSensitvity")
+         try:
+             self.sensitivity = getSensitivity(self.domain, context, debug)
+         except:
+-            print("Error : %s : %s" % ( sys.exc_info()[0], traceback.format_exc()))
++            logging.debug("Error : %s : %s" % ( sys.exc_info()[0], traceback.format_exc()))
+ 
+         self.init_preferences()
+ 
+@@ -579,12 +518,12 @@
+             for key in self.domain.groups.keys():
+                 group = self.domain.groups[key]
+                 if debug:
+-                    print "group: ", group
++                    logging.debug("group: " + group)
+                 codewords = labelObj.codewords[key]
+                 if len(codewords) > 0:
+                     for codeword in codewords:
+                         if debug:
+-                            print "codeword: ", codeword
++                            logging.debug("codeword: " + codeword)
+                         for cw in group.wordDict.values():
+                             if cw.word == codeword:
+                                 cw.used = True
+@@ -662,7 +601,7 @@
+             while i <= self.saved_labels_max and i < count:
+                 key = iter.next()
+                 if debug:
+-                    print "save ",self.history[key]
++                    logging.debug( "save " + self.history[key])
+                 pickle.dump(self.history[key], src)
+ #                    print >>sys.stderr, self.history[key]
+                 i = i + 1
+@@ -692,17 +631,17 @@
+         self.dialogWindow.show()
+ 
+     def on_cb_clicked(self):
+-        print >>sys.stderr, "combobox clicked"
++        logging.debug("combobox clicked")
+ 
+     def level_selection_changed( self, selection ):
+         index = selection.get_active()
+         if self.debug:
+-            print("level_selection_changed: %s" % (selection.get_model()[index][0]))
++            logging.debug("level_selection_changed: %s" % (selection.get_model()[index][0]))
+         self.label.setLevel(selection.get_model()[index][0])
+         self.set_entry_level()
+ 
+         if self.debug:
+-            print "set active -1"
++            logging.debug("set active -1")
+         self.groups_combobox.set_active(-1)
+         if self.domain.findSensitivityByName(selection.get_model()[index][0]) == None:
+             self.groups_combobox.set_sensitive(True)
+@@ -733,21 +672,21 @@
+ 
+     def group_popup( self, widget, data=None):
+         if self.debug:
+-            print "popup"
++            logging.debug("popup")
+         widget.set_active(-1)
+ 
+ 
+     def group_selection_changed( self, selection ):
+         index = selection.get_active()
+         if self.debug:
+-            print("LabelDialog.group_selection_changed %d" % index);
++            logging.debug("LabelDialog.group_selection_changed %d" % index);
+         if index == -1:
+             return
+         if self.wordDialog != None:
+             self.wordDialog.destroy()
+ # Reset the level entry field
+         if self.debug:
+-            print("Create WordDialog");
++            logging.debug("Create WordDialog");
+         try:
+             self.wordDialog = WordDialog("codeword.glade", self.label, self.debug)
+             self.wordDialog.populate(self.domain.groups[selection.get_model()[index][0]], self.widgets['levelComboBoxEntry'].child)
+@@ -768,7 +707,7 @@
+             if self.history.has_key(self.label.str()):
+                 del self.history[self.label.str()]
+             if self.debug:
+-                print "add %s to histrory" % self.label.str()
++                logging.debug("add %s to histrory" % self.label.str())
+             self.history.insert(0, self.label.str(), self.label)
+ 
+             self.save_history()
+@@ -792,6 +731,66 @@
+             
+ #        self.selection_str = self.preferences.get_string("/apps/label-dialog/default_label")
+ 
++def populate_label_dialog( label_dialog ):
++    if label_dialog.title:
++        if label_dialog.debug:
++            logging.debug(_("title %s") % (label_dialog.title))
++        label_dialog.dialogWindow.set_title(label_dialog.title)
++
++    closeButton = label_dialog.widgets['cancelButton']
++    closeButton.connect('clicked', label_dialog.dialogClose)
++    label_dialog.okButton = label_dialog.widgets['okButton']
++    label_dialog.okButtonHandlerId = label_dialog.okButton.connect('clicked', label_dialog.Ok)
++    label_dialog.dialogWindow.connect('close', label_dialog.close)
++    label_dialog.dialogWindow.connect('delete_event', label_dialog.close)
++    label_dialog.dialogWindow.set_position(gtk.WIN_POS_MOUSE)
++
++# Populate the levels combobox
++    label_dialog.levels_combobox = label_dialog.widgets['levelComboBox']
++    label_dialog.levels_combobox.set_tooltip_text("Select level for new label.")
++    for key in label_dialog.domain.sensitivities.keys():
++        if label_dialog.domain.sensitivities[key].find("-") == -1:
++            if label_dialog.debug:
++                logging.debug("%s %s" % (label_dialog.sensitivity, label_dialog.domain.sensitivities[key]))
++            if check_level_dominance2(label_dialog.sensitivity, label_dialog.domain.sensitivities[key]):
++                label_dialog.levels_combobox.append_text(label_dialog.domain.sensitivities[key])
++    for key in label_dialog.domain.baseClassifications.keys():
++        for sensitivity in label_dialog.domain.baseClassifications[key].sensitivities.keys():
++            if check_level_dominance2(label_dialog.sensitivity, label_dialog.domain.baseClassifications[key].sensitivities[sensitivity]):
++                label_dialog.levels_combobox.append_text(label_dialog.domain.baseClassifications[key].sensitivities[sensitivity])
++    label_dialog.levels_combobox.connect("changed", label_dialog.level_selection_changed )
++
++# Populate the group combobox
++    label_dialog.groups_combobox = label_dialog.widgets['groupComboBox']
++    label_dialog.groups_combobox.set_tooltip_text("Set words on new label.")    
++    for key in label_dialog.domain.groups.keys():
++        label_dialog.groups_combobox.append_text(key)
++
++    label_dialog.groups_combobox.connect("changed", label_dialog.group_selection_changed )
++#        label_dialog.groups_combobox.connect("notify::popup-shown", label_dialog.group_popup )
++    label_dialog.groups_combobox.connect('button-press-event', label_dialog.on_cb_clicked)
++    label_dialog.groups_combobox.set_sensitive(False)
++    label_dialog.groups_combobox.show()
++
++# Load history
++
++    label_dialog.history = OrderedDict()
++    label_dialog.load_history(True)
++# Populate the 
++    label_dialog.history_combobox = label_dialog.widgets['levelComboBoxEntry']
++    label_dialog.history_combobox.set_tooltip_text("History list of previously used labels.")
++    for label in label_dialog.history.keys():
++        if check_level_dominance(label, False):
++            label_dialog.history_combobox.append_text(label)
++    label_dialog.history_combobox.connect("changed", label_dialog.history_selection_changed )
++    label_dialog.entry = label_dialog.widgets['levelComboBoxEntry'].child
++    label_dialog.entry.connect("delete-text", label_dialog.delete_text, label_dialog)
++    label_dialog.entry.connect("insert-text", label_dialog.insert_text, label_dialog)
++    label_dialog.history_combobox.show()
++    label_dialog.label = Label(label_dialog.domain)
++    label_dialog.wordDialog = None
++    label_dialog.build_used_codeword_list()
++
+ def error_dialog(message):
+     dialog = gtk.MessageDialog(
+         parent         = None,

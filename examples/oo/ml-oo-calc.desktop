@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Terminal=false
+Icon=openofficeorg-calc
+Type=Application
+InitialPreference=2
+Categories=Application;Office;X-Red-Hat-Base;X-SuSE-Core-Office;X-MandrivaLinux-Office-Spreadsheets;
+Exec=/usr/share/mls-tools/examples/oo/ml-oo-calc
+MimeType=application/vnd.oasis.opendocument.spreadsheet;application/vnd.oasis.opendocument.spreadsheet-template;application/vnd.sun.xml.calc;application/vnd.sun.xml.calc.template;application/vnd.stardivision.calc;application/vnd.stardivision.chart;application/msexcel;application/vnd.ms-excel
+Name=OpenOffice.org Calc at level
+NoDisplay=true
+

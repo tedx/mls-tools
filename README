@@ -1,0 +1,9 @@
+mls-tools provides scripts for running applications at specific MLS levels. 
+Included are examples for gnome-terminal and firefox which can be used as
+guides for enabling other applications to be run at level.
+
+Notes on building mls-tools:
+You will need automake-1.7 and aclocal-1.7
+type './autogen.sh'
+type 'make'
+type 'make srpm'
