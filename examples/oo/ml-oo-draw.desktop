@@ -6,7 +6,7 @@ Icon=openofficeorg-draw
 Type=Application
 InitialPreference=2
 Categories=Application;
-Exec=/usr/share/mls-tools/examples/oo/ml-oo-draw
+Exec==/usr/bin/ml-launch -n "/usr/bin/dbus-launch --exit-with-session openoffice.org -draw"
 Name=OpenOffice.org Draw at level
 StartupNotify=true
 MimeType=application/vnd.oasis.opendocument.graphics;application/vnd.oasis.opendocument.graphics-template;application/vnd.sun.xml.draw;application/vnd.sun.xml.draw.template;application/vnd.stardivision.draw;

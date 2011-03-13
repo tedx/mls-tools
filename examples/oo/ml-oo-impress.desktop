@@ -6,7 +6,7 @@ Icon=openofficeorg-impress
 Type=Application
 InitialPreference=2
 Categories=Application;
-Exec=/usr/share/mls-tools/examples/oo/ml-oo-impress
+Exec==/usr/bin/ml-launch -n "/usr/bin/dbus-launch --exit-with-session openoffice.org -impress"
 Name=OpenOffice.org Impress at level
 StartupNotify=true
 MimeType=application/vnd.oasis.opendocument.presentation;application/vnd.oasis.opendocument.presentation-template;application/vnd.sun.xml.impress;application/vnd.sun.xml.impress.template;application/vnd.stardivision.impress;application/mspowerpoint;application/vnd.ms-powerpoint;application/vnd.openxmlformats-officedocument.presentationml.presentation;application/vnd.ms-powerpoint.presentation.macroenabled.12;application/vnd.openxmlformats-officedocument.presentationml.template;application/vnd.ms-powerpoint.template.macroenabled.12;
