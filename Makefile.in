@@ -167,7 +167,7 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 USE_NLS = @USE_NLS@
-VERSION = @VERSION@
+VERSION = $(shell awk '/Version:/ { print $$2 }' mls-tools.spec)
 XGETTEXT = @XGETTEXT@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -699,6 +699,16 @@ clean:
 	rm -Rf autom4te.cache
 	rm -f *.log
 	rm -f *~
+	rm -f mls-tools*tar.gz
+
+tarball: clean
+	-tar --create --transform='s,^mls-tools,mls-tools-$(VERSION),' --show-transformed --file=mls-tools-$(VERSION).tar.gz --directory=.. -z --exclude-vcs --exclude=mls-tools-$(VERSION).tar.gz -v mls-tools
+
+srpm: tarball
+	mkdir -p ~/rpmbuild/SOURCES 
+	mkdir -p ~/rpmbuild/SRPMS
+	mv mls-tools-$(VERSION).tar.gz ~/rpmbuild/SOURCES
+	rpmbuild -bs mls-tools.spec
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

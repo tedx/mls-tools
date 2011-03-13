@@ -97,12 +97,12 @@ DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/tedx/mls-tools-0.0.1/missing --run aclocal-1.11
+ACLOCAL = ${SHELL} /home/tedx/mls-tools/missing --run aclocal-1.11
 ALL_LINGUAS = en ja ko
-AMTAR = ${SHELL} /home/tedx/mls-tools-0.0.1/missing --run tar
-AUTOCONF = ${SHELL} /home/tedx/mls-tools-0.0.1/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/tedx/mls-tools-0.0.1/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/tedx/mls-tools-0.0.1/missing --run automake-1.11
+AMTAR = ${SHELL} /home/tedx/mls-tools/missing --run tar
+AUTOCONF = ${SHELL} /home/tedx/mls-tools/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/tedx/mls-tools/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/tedx/mls-tools/missing --run automake-1.11
 AWK = gawk
 CATALOGS =  en.gmo ja.gmo ko.gmo
 CATOBJEXT = .gmo
@@ -140,7 +140,7 @@ LIBOBJS =
 LIBS = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/tedx/mls-tools-0.0.1/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/tedx/mls-tools/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
 MKINSTALLDIRS = ./mkinstalldirs
 MSGFMT = /usr/bin/msgfmt
@@ -167,12 +167,12 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = 
 USE_NLS = yes
-VERSION = 0.0.1
+VERSION = $(shell awk '/Version:/ { print $$2 }' mls-tools.spec)
 XGETTEXT = /usr/bin/xgettext
-abs_builddir = /home/tedx/mls-tools-0.0.1
-abs_srcdir = /home/tedx/mls-tools-0.0.1
-abs_top_builddir = /home/tedx/mls-tools-0.0.1
-abs_top_srcdir = /home/tedx/mls-tools-0.0.1
+abs_builddir = /home/tedx/mls-tools
+abs_srcdir = /home/tedx/mls-tools
+abs_top_builddir = /home/tedx/mls-tools
+abs_top_srcdir = /home/tedx/mls-tools
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -191,7 +191,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/tedx/mls-tools-0.0.1/install-sh
+install_sh = ${SHELL} /home/tedx/mls-tools/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -699,6 +699,16 @@ clean:
 	rm -Rf autom4te.cache
 	rm -f *.log
 	rm -f *~
+	rm -f mls-tools*tar.gz
+
+tarball: clean
+	-tar --create --transform='s,^mls-tools,mls-tools-$(VERSION),' --show-transformed --file=mls-tools-$(VERSION).tar.gz --directory=.. -z --exclude-vcs --exclude=mls-tools-$(VERSION).tar.gz -v mls-tools
+
+srpm: tarball
+	mkdir -p ~/rpmbuild/SOURCES 
+	mkdir -p ~/rpmbuild/SRPMS
+	mv mls-tools-$(VERSION).tar.gz ~/rpmbuild/SOURCES
+	rpmbuild -bs mls-tools.spec
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
