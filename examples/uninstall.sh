@@ -1,21 +1,34 @@
 #!/bin/bash
 # Restore the  backups
-sudo mv /etc/pam.d/newrole.orig /etc/pam.d/newrole
-sudo mv /etc/pam.d/gdm.orig /etc/pam.d/gdm
-sudo mv /etc/pam.d/gdm-autologin.orig /etc/pam.d/gdm-autologin
-sudo mv /etc/pam.d/gdm-password.orig /etc/pam.d/gdm-password
-sudo mv /etc/security/namespace.conf.orig  /etc/security/namespace.conf
+if [ -f /etc/pam.d/newrole.orig ];
+then
+    sudo mv -f /etc/pam.d/newrole.orig /etc/pam.d/newrole
+fi
+if [ -f /etc/pam.d/gdm.orig ];
+then
+    sudo mv -f /etc/pam.d/gdm.orig /etc/pam.d/gdm
+fi
+if [ -f /etc/pam.d/gdm-autologin.orig ];
+then
+    sudo mv -f /etc/pam.d/gdm-autologin.orig /etc/pam.d/gdm-autologin
+fi
+if [ -f /etc/pam.d/gdm-password.orig ];
+then
+    sudo mv -f /etc/pam.d/gdm-password.orig /etc/pam.d/gdm-password
+fi
+if [ -f /etc/security/namespace.conf.orig ];
+then
+    sudo mv -f /etc/security/namespace.conf.orig  /etc/security/namespace.conf
+fi
 
-# Remove the polyinstantiation instance directories
-rm -Rf ~/.dbus.inst
-rm -Rf ~/.gconf.inst
-rm -Rf ~/.gconfd.inst
-rm -Rf ~/.gnome2.isnt
-rm -Rf ~/.mozilla.inst
-#rm -Rf ~/.metacity.inst
-rm -Rf ~/.openoffice.org.inst
-
-sudo rm -Rf /tmp.inst
 
 #uninstall the added policy
 sudo semodule -r mls-tools-example
+
+sudo sh -c "cd oo; ./uninstall.sh"
+sudo sh -c "cd firefox; ./uninstall.sh"
+sudo sh -c "cd gnome-terminal; ./uninstall.sh"
+
+echo "Log out and after logging back in run:"
+echo "/usr/share/mls-tools/examples/uninstall-poly.sh"
+echo "to clean up polyinstantiated directories."

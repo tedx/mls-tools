@@ -1,3 +1,4 @@
+#!/bin/bash
 
 replace_conf()
 {
@@ -6,6 +7,11 @@ $0 ~ regex { printf("%s=%s\n", mime_type, desktop) }
 $0 !~ regex { print $0 }
 ' /usr/share/applications/defaults.list > temp ; mv temp /usr/share/applications/defaults.list
 }
+
+if [ ! -f /usr/share/applications/defaults.list.orig ]
+then
+    cp /usr/share/applications/defaults.list /usr/share/applications/defaults.list.orig
+fi
 
 grep -q "application/vnd.oassis.opendocument.graphics" /usr/share/applications/defaults.list
 if [ $? -eq 1 ]; then
@@ -41,3 +47,8 @@ replace_conf "application/vnd.oasis.opendocument.graphics-template" "ml-oo-draw.
 replace_conf "application/pdf" "ml-evince.desktop"
 replace_conf "application/postscript" "ml-evince.desktop"
 replace_conf "application/x-dvi" "ml-evince.desktop"
+
+cp ml-oo-calc.desktop /usr/share/applications
+cp ml-oo-impress.desktop /usr/share/applications
+cp ml-oo-draw.desktop /usr/share/applications
+cp ml-oo-writer.desktop /usr/share/applications

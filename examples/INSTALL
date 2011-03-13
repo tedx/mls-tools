@@ -1,0 +1,1 @@
+As a non-root user run the install.sh script to setup polyinstantiation, load the example SELinux policy and install the desktop files.

@@ -1,9 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=ML Firefox @ ask
+Name=ML Firefox at level
 Name[ja]=ML Firefox
 Name[ko]=ML Firefox (ML 터미너)
-Comment=Multilevel Firefox @ ask
+Comment=Multilevel Firefox at level
 Comment[ja]=Multilevel Firefox
 Comment[ko]=Multilevel Firefox (Multilevel 터미너)
 Exec=/usr/bin/ml-launch "/usr/bin/dbus-launch --exit-with-session /usr/share/mls-tools/examples/firefox/ml-firefox"
