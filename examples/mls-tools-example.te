@@ -6,6 +6,7 @@ require {
 	all_userspace_class_perms
 	type xserver_t;
 	type user_wm_t;
+	type user_openoffice_t;
 	type security_t;
 	type xdm_t;
 	type newrole_t;
@@ -28,6 +29,8 @@ allow xserver_t security_t:security compute_member;
 mls_xwin_write_all_levels(user_t)
 mls_socket_write_to_clearance(user_t)
 
+mls_xwin_write_all_levels(user_openoffice_t)
+
 mls_socket_write_all_levels(user_wm_t)
 mls_socket_read_all_levels(user_wm_t)
 
@@ -46,3 +49,15 @@ allow xdm_t gnome_home_t:dir read;
 allow xdm_t mozilla_home_t:dir read;
 allow xdm_t user_home_t:dir read;
 allow xdm_t tmp_t:dir read;
+
+# hacks to get openoffice to run in enforcing need reviewing
+require {
+	type clipboard_xproperty_t;
+	type config_home_t;
+	type user_home_dir_t;
+	type user_home_t;
+}
+allow user_openoffice_t clipboard_xproperty_t:x_property getattr;
+allow user_openoffice_t config_home_t:dir setattr;
+allow user_openoffice_t user_home_dir_t:dir { write remove_name add_name };
+allow user_openoffice_t user_home_t:file { write unlink };
