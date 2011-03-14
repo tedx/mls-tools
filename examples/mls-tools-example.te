@@ -50,7 +50,14 @@ allow xdm_t mozilla_home_t:dir read;
 allow xdm_t user_home_t:dir read;
 allow xdm_t tmp_t:dir read;
 
-# hacks to get openoffice to run in enforcing need reviewing
+# hacks to get openoffice to run in enforcing 
+require {
+	type user_dbusd_t;
+	type xdm_home_t;
+}
+allow user_ml_launch_t user_dbusd_t:unix_stream_socket connectto;
+allow user_ml_launch_t xdm_home_t:file { write };
+
 require {
 	type clipboard_xproperty_t;
 	type config_home_t;
